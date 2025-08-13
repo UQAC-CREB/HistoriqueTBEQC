@@ -12,8 +12,14 @@ annees <- 2007:2024
 base_url <- "https://raw.githubusercontent.com/hgesdrn/TBE_QC_shiny/main/data_qs/"
 
 # Fonction pour charger un fichier .qs depuis GitHub dans un fichier temporaire
+# charger_qs_github <- function(fichier_qs_url) {
+#   temp <- tempfile(fileext = ".qs")
+#   download.file(fichier_qs_url, temp, mode = "wb", quiet = TRUE)
+#   qs::qread(temp)
+# }
+
 charger_qs_github <- function(fichier_qs_url) {
-  temp <- tempfile(fileext = ".qs")
+  temp <- tempfile(fileext = "v2.qs")
   download.file(fichier_qs_url, temp, mode = "wb", quiet = TRUE)
   qs::qread(temp)
 }
@@ -114,7 +120,8 @@ server <- function(input, output, session) {
   observe({
     for (yr in annees) {
       isolate({
-        url_fichier <- paste0(base_url, "TBE_", yr, ".qs")
+        # url_fichier <- paste0(base_url, "TBE_", yr, ".qs")
+        url_fichier <- paste0(base_url, "TBE_", yr, "v2.qs")
         message("Chargement : ", url_fichier)
         rv$tbe_data[[as.character(yr)]] <- charger_qs_github(url_fichier)
       })
