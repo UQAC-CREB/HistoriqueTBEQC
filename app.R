@@ -84,7 +84,7 @@ server <- function(input, output, session) {
   observe({
     for (yr in annees) {
       isolate({
-        url_fichier <- paste0(base_url, "TBE_", yr, "_v3.qs")
+        url_fichier <- paste0(base_url, "TBE_", yr, "v2.qs")
         message("Chargement : ", url_fichier)
         rv$tbe_data[[as.character(yr)]] <- charger_qs_github(url_fichier)
       })
