@@ -10,7 +10,7 @@ library(qs)
 annees <- 2006:2024
 
 # ---- Base URL GitHub ----
-base_url <- "https://raw.githubusercontent.com/hgesdrn/TBE_QC_shiny/main/data/"
+base_url <- "https://raw.githubusercontent.com/hgesdrn/TBE_QC_shiny/main/data_qs/"
 
 # ---- Fonction pour charger un .qs depuis GitHub ----
 charger_qs_github <- function(fichier_qs_url) {
