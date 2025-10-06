@@ -10,7 +10,7 @@ library(qs)
 annees <- 2006:2024
 
 # ---- Base URL GitHub ----
-base_url <- "https://raw.githubusercontent.com/hgesdrn/TBE_QC_shiny/main/data_qs/"
+base_url <- "https://raw.githubusercontent.com/hgesdrn/TBE_QC_shiny/main/data/"
 
 # ---- Fonction pour charger un .qs depuis GitHub ----
 charger_qs_github <- function(fichier_qs_url) {
@@ -23,7 +23,7 @@ charger_qs_github <- function(fichier_qs_url) {
 qc_contour <- readRDS(url("https://raw.githubusercontent.com/hgesdrn/TBE_QC_shiny/main/data/prov_sf.rds"))
 
 # ---- Table tabulaire fusionnée ----
-df_tbe_tabulaire <- charger_qs_github(paste0(base_url, "TBE_table_complete_v3.qs"))
+df_tbe_tabulaire <- charger_qs_github(paste0(base_url, "TBE_table_complete.qs"))
 
 # ---- UI ----
 ui <- fluidPage(
@@ -84,7 +84,7 @@ server <- function(input, output, session) {
   observe({
     for (yr in annees) {
       isolate({
-        url_fichier <- paste0(base_url, "TBE_", yr, "v2.qs")
+        url_fichier <- paste0(base_url, "TBE_", yr, "_v5.qs")
         message("Chargement : ", url_fichier)
         rv$tbe_data[[as.character(yr)]] <- charger_qs_github(url_fichier)
       })
