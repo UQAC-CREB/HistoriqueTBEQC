@@ -152,7 +152,8 @@ server <- function(input, output, session) {
   # Graphique Québec
   output$plot_quebec <- renderPlot({
     df_quebec <- df_tbe_tabulaire %>%
-      filter(!is.na(AN_TBE), AN_TBE %in% annees) %>% 
+      filter(RES_NM_REG == "Province du Québec",
+        !is.na(AN_TBE), AN_TBE %in% annees) %>% 
       group_by(AN_TBE) %>%
       summarise(SUP_HA = sum(SUP_HA, na.rm = TRUE)) %>%
       mutate(SUP_HA = SUP_HA / 1e6,
