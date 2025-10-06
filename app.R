@@ -6,35 +6,29 @@ library(ggplot2)
 library(shinyWidgets)
 library(qs)
 
-annees <- 2007:2024
+# ---- Série temporelle ----
+annees <- 2006:2024
 
-# Base URL GitHub brute pour fichiers .qs
-base_url <- "https://raw.githubusercontent.com/hgesdrn/TBE_QC_shiny/main/data_qs/"
+# ---- Base URL GitHub ----
+base_url <- "https://raw.githubusercontent.com/hgesdrn/TBE_QC_shiny/main/data/"
 
-# Fonction pour charger un fichier .qs depuis GitHub dans un fichier temporaire
-# charger_qs_github <- function(fichier_qs_url) {
-#   temp <- tempfile(fileext = ".qs")
-#   download.file(fichier_qs_url, temp, mode = "wb", quiet = TRUE)
-#   qs::qread(temp)
-# }
-
+# ---- Fonction pour charger un .qs depuis GitHub ----
 charger_qs_github <- function(fichier_qs_url) {
-  temp <- tempfile(fileext = "v2.qs")
+  temp <- tempfile(fileext = ".qs")
   download.file(fichier_qs_url, temp, mode = "wb", quiet = TRUE)
   qs::qread(temp)
 }
 
-# Chargement du contour de la province (peut rester en .rds si simplifié)
+# ---- Contour Québec ----
 qc_contour <- readRDS(url("https://raw.githubusercontent.com/hgesdrn/TBE_QC_shiny/main/data/prov_sf.rds"))
 
-# Précharger les données tabulaires fusionnées (pour les graphiques)
-df_tbe_tabulaire <- charger_qs_github(paste0(base_url, "TBE_table_complete.qs"))
+# ---- Table tabulaire fusionnée ----
+df_tbe_tabulaire <- charger_qs_github(paste0(base_url, "TBE_table_complete_v3.qs"))
 
-# UI
+# ---- UI ----
 ui <- fluidPage(
   titlePanel(NULL),
   tags$style(HTML("
-  /* --- Style général de l’en-tête --- */
     .header-title {
       background-color: #2C3E50;
       color: white;
@@ -47,8 +41,6 @@ ui <- fluidPage(
       margin-bottom: 20px;
       box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
     }
-
-    /* --- Style des encadrés latéraux --- */
     .box-style {
       background-color: #f9f9f9;
       border: 1px solid #ccc;
@@ -58,35 +50,8 @@ ui <- fluidPage(
       height: 700px;
       overflow-y: auto;
     }
-
-    /* --- Style personnalisé du slider (contraste élevé) --- */
-    .irs--shiny .irs-line {
-      background-color: #ddd !important; /* ligne complète */
-      border-color: #ddd !important;
-    }
-    
-    .irs--shiny .irs-bar {
-      background-color: #ddd !important; /* portion entre min et curseur */
-      border-color: #ddd !important;
-    }
-    
-    .irs--shiny .irs-bar-edge {
-      background-color: #ddd !important;
-      border-color: #ddd !important;
-    }
-    
-    .irs--shiny .irs-single {
-      background-color: #ddd !important; /* valeur affichée */
-      border-color: #ddd !important;
-      color: black !important;
-    }
-    
-    .irs--shiny .irs-handle {
-      border-color: #999 !important; /* curseur */
-      background-color: #999 !important;
-    }
-                  ")), # Tu peux laisser le CSS tel quel
-  div("Superficie annuelle affectée par la TBE de 2007 à 2024", class = "header-title"),
+  ")),
+  div("Superficie annuelle affectée par la TBE de 2006 à 2024", class = "header-title"),
   fluidRow(
     column(6,
            div(class = "box-style",
@@ -94,7 +59,7 @@ ui <- fluidPage(
                  inputId = "annee",
                  label = "Choisissez une année :",
                  choices = as.character(annees),
-                 selected = "2007",
+                 selected = "2006",
                  grid = TRUE,
                  width = "100%"
                ),
@@ -110,34 +75,30 @@ ui <- fluidPage(
   )
 )
 
-# Serveur
+# ---- Serveur ----
 server <- function(input, output, session) {
   
-  # Conteneur en mémoire pour les polygones TBE
   rv <- reactiveValues(tbe_data = list())
   
-  # Charger les polygones une fois au démarrage
+  # Charger tous les polygones au démarrage
   observe({
     for (yr in annees) {
       isolate({
-        # url_fichier <- paste0(base_url, "TBE_", yr, ".qs")
-        url_fichier <- paste0(base_url, "TBE_", yr, "v2.qs")
+        url_fichier <- paste0(base_url, "TBE_", yr, "_v3.qs")
         message("Chargement : ", url_fichier)
         rv$tbe_data[[as.character(yr)]] <- charger_qs_github(url_fichier)
       })
     }
   })
   
-  # Filtre selon l’année sélectionnée
   data_filtered <- reactive({
     req(input$annee)
     rv$tbe_data[[input$annee]]
   })
   
-  # Carte initiale
+  # Carte
   output$map <- renderLeaflet({
     bbox <- st_bbox(qc_contour)
-    
     leaflet(options = leafletOptions(preferCanvas = TRUE)) %>%
       addProviderTiles("CartoDB.Positron") %>%
       addPolygons(
@@ -148,16 +109,13 @@ server <- function(input, output, session) {
         weight = 0,
         group = "Province"
       ) %>%
-      # fitBounds(lng1 = bbox[["xmin"]], lat1 = bbox[["ymin"]],
-      #           lng2 = bbox[["xmax"]], lat2 = bbox[["ymax"]])
       fitBounds(lng1 = bbox[["xmin"]], lat1 = 45.0,
                 lng2 = bbox[["xmax"]], lat2 = 52.5)
   })
   
-  # Mise à jour des polygones TBE
+  # Mise à jour polygones
   observeEvent(input$annee, {
     req(data_filtered())
-    
     leafletProxy("map") %>%
       clearGroup("TBE") %>%
       addPolygons(
@@ -188,18 +146,9 @@ server <- function(input, output, session) {
       ylim(0, 15) +
       scale_fill_manual(values = c("Sélectionnée" = "#4a5a76", "Autre" = "gray50"), guide = "none") +
       labs(title = "Saguenay–Lac-Saint-Jean", x = NULL, y = "Superficie (millions ha)") +
-      theme_minimal() +
-      theme(
-        axis.text.y = element_text(face = "bold", size = 10),
-        axis.text.x = element_text(face = "bold", size = 10), 
-        axis.title.x = element_text(face = "bold", size = 12, margin = margin(t = 15)),
-        axis.title.y = element_text(face = "bold", size = 12, margin = margin(r = 10)),
-        plot.title = element_text(size = 14, face = "bold")
-      )
-
-      
+      theme_minimal()
   })
-
+  
   # Graphique Québec
   output$plot_quebec <- renderPlot({
     df_quebec <- df_tbe_tabulaire %>%
@@ -216,14 +165,7 @@ server <- function(input, output, session) {
       ylim(0, 15) +
       scale_fill_manual(values = c("Sélectionnée" = "#085016", "Autre" ="gray50"), guide = "none") +
       labs(title = "Province du Québec", x = NULL, y = "Superficie (millions ha)") +
-      theme_minimal()+
-      theme(
-        axis.text.y = element_text(face = "bold", size = 10),
-        axis.text.x = element_text(face = "bold", size = 10), 
-        axis.title.x = element_text(face = "bold", size = 12, margin = margin(t = 15)),
-        axis.title.y = element_text(face = "bold", size = 12, margin = margin(r = 10)),
-        plot.title = element_text(size = 14, face = "bold")
-      )
+      theme_minimal()
   })
 }
 
