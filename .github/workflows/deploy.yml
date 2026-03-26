@@ -6,6 +6,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      RENV_CONFIG_AUTOLOAD_ENABLED: "FALSE"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
