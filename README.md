@@ -1,10 +1,10 @@
-# TBE_QC_shiny
+# Historique des relevés aériens de la TBE au Québec
 
-[![Deploy Shiny App](https://github.com/hgesdrn/TBE_QC_shiny/actions/workflows/deploy.yml/badge.svg)](https://github.com/hgesdrn/TBE_QC_shiny/actions/workflows/deploy.yml)
+[![Deploy Shiny App](https://github.com/UQAC-CREB/HistoriqueTBEQC/actions/workflows/deploy.yml/badge.svg)](https://github.com/UQAC-CREB/HistoriqueTBEQC/actions/workflows/deploy.yml)
 
 Application Shiny permettant de visualiser les superficies affectées par la tordeuse des bourgeons de l’épinette (TBE) au Québec de 2006 à 2024.
 
-🔗 [Accéder à l’application déployée sur shinyapps.io](https://hgesdrn.shinyapps.io/TBE_QC_shiny/)
+🔗 [Accéder à l’application déployée sur shinyapps.io](https://creb-uqac.shinyapps.io/HistoriqueTBEQC/)
 
 ## Fonctionnalités
 
