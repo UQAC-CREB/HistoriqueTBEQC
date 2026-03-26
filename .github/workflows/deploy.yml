@@ -22,7 +22,7 @@ jobs:
             dplyr
             ggplot2
             leaflet
-            qs
+            qsbase/qs
             sf
             shinyWidgets
 
