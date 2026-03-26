@@ -19,6 +19,12 @@ jobs:
           packages: |
             shiny
             rsconnect
+            dplyr
+            ggplot2
+            leaflet
+            qs
+            sf
+            shinyWidgets
 
       - name: Deploy to ShinyApps.io
         env:
