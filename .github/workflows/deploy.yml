@@ -20,9 +20,6 @@ jobs:
             shiny
             rsconnect
 
-      - name: Install latest rsconnect
-        run: Rscript -e "install.packages('rsconnect', repos='https://cloud.r-project.org')"
-
       - name: Deploy to ShinyApps.io
         env:
           SHINYAPPS_ACCOUNT: ${{ secrets.SHINYAPPS_ACCOUNT }}
@@ -39,6 +36,7 @@ jobs:
               appDir      = '.',
               appName     = 'HistoriqueTBEQC',
               forceUpdate = TRUE,
-              lint        = FALSE
+              lint        = FALSE,
+              useLockfile = FALSE
             )
           "
