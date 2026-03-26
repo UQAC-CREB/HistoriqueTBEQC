@@ -33,7 +33,10 @@ jobs:
           SHINYAPPS_ACCOUNT: ${{ secrets.SHINYAPPS_ACCOUNT }}
           SHINYAPPS_TOKEN: ${{ secrets.SHINYAPPS_TOKEN }}
           SHINYAPPS_SECRET: ${{ secrets.SHINYAPPS_SECRET }}
+          RENV_CONFIG_AUTOLOAD_ENABLED: "FALSE"
         run: |
+          # Renommer temporairement .Rprofile pour que renv ne se charge pas
+          mv .Rprofile .Rprofile.bak || true
           Rscript -e "
             rsconnect::setAccountInfo(
               name   = Sys.getenv('SHINYAPPS_ACCOUNT'),
@@ -48,3 +51,5 @@ jobs:
               lint        = FALSE
             )
           "
+          # Restaurer .Rprofile après le déploiement
+          mv .Rprofile.bak .Rprofile || true
