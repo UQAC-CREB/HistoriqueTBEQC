@@ -36,7 +36,6 @@ jobs:
               appDir      = '.',
               appName     = 'HistoriqueTBEQC',
               forceUpdate = TRUE,
-              lint        = FALSE,
-              useLockfile = FALSE
+              lint        = FALSE
             )
           "
