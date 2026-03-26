@@ -1,14 +1,11 @@
 name: Deploy to ShinyApps.io
-
 on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -23,6 +20,9 @@ jobs:
             shiny
             rsconnect
 
+      - name: Install latest rsconnect
+        run: Rscript -e "install.packages('rsconnect', repos='https://cloud.r-project.org')"
+
       - name: Deploy to ShinyApps.io
         env:
           SHINYAPPS_ACCOUNT: ${{ secrets.SHINYAPPS_ACCOUNT }}
@@ -36,8 +36,9 @@ jobs:
               secret = Sys.getenv('SHINYAPPS_SECRET')
             )
             rsconnect::deployApp(
-              appDir    = '.',
-              appName   = 'HistoriqueTBEQC',
-              forceUpdate = TRUE
+              appDir      = '.',
+              appName     = 'HistoriqueTBEQC',
+              forceUpdate = TRUE,
+              lint        = FALSE
             )
           "
