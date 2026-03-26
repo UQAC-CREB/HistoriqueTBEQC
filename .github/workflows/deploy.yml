@@ -35,6 +35,7 @@ jobs:
             rsconnect::deployApp(
               appDir      = '.',
               appName     = 'HistoriqueTBEQC',
+              appFiles    = c('app.R', list.files('data', full.names=TRUE)),
               forceUpdate = TRUE,
               lint        = FALSE
             )
