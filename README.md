@@ -24,3 +24,4 @@ Les fichiers de données sont stockés dans le dossier `data/` et incluent :
 ---
 
 🛠️ Déploiement automatique via GitHub Actions
+
