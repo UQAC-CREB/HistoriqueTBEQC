@@ -4,7 +4,7 @@ library(sf)
 library(dplyr)
 library(ggplot2)
 library(shinyWidgets)
-library(qs)
+library(qs2)
 
 # ---- Série temporelle ----
 annees <- 2006:2024
@@ -12,18 +12,18 @@ annees <- 2006:2024
 # ---- Base URL GitHub ----
 base_url <- "https://raw.githubusercontent.com/UQAC-CREB/HistoriqueTBEQC/main/data/"
 
-# ---- Fonction pour charger un .qs depuis GitHub ----
-charger_qs_github <- function(fichier_qs_url) {
-  temp <- tempfile(fileext = ".qs")
-  download.file(fichier_qs_url, temp, mode = "wb", quiet = TRUE)
-  qs::qread(temp)
+# ---- Fonction pour charger un .qs2 depuis GitHub ----
+charger_qs2_github <- function(fichier_url) {
+  temp <- tempfile(fileext = ".qs2")
+  download.file(fichier_url, temp, mode = "wb", quiet = TRUE)
+  qs2::qs_read(temp)
 }
 
 # ---- Contour Québec ----
 qc_contour <- readRDS(url("https://raw.githubusercontent.com/UQAC-CREB/HistoriqueTBEQC/main/data/prov_sf.rds"))
 
 # ---- Table tabulaire fusionnée ----
-df_tbe_tabulaire <- charger_qs_github(paste0(base_url, "TBE_table_complete.qs"))
+df_tbe_tabulaire <- charger_qs2_github(paste0(base_url, "TBE_table_complete.qs2"))
 
 # ---- UI ----
 ui <- fluidPage(
@@ -84,9 +84,9 @@ server <- function(input, output, session) {
   observe({
     for (yr in annees) {
       isolate({
-        url_fichier <- paste0(base_url, "TBE_", yr, "_v5.qs")
+        url_fichier <- paste0(base_url, "TBE_", yr, "_v5.qs2")
         message("Chargement : ", url_fichier)
-        rv$tbe_data[[as.character(yr)]] <- charger_qs_github(url_fichier)
+        rv$tbe_data[[as.character(yr)]] <- charger_qs2_github(url_fichier)
       })
     }
   })
@@ -153,7 +153,7 @@ server <- function(input, output, session) {
   output$plot_quebec <- renderPlot({
     df_quebec <- df_tbe_tabulaire %>%
       filter(RES_NM_REG == "Province du Québec",
-        !is.na(AN_TBE), AN_TBE %in% annees) %>% 
+             !is.na(AN_TBE), AN_TBE %in% annees) %>% 
       group_by(AN_TBE) %>%
       summarise(SUP_HA = sum(SUP_HA, na.rm = TRUE)) %>%
       mutate(SUP_HA = SUP_HA / 1e6,
